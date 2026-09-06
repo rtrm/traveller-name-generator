@@ -2,7 +2,7 @@
   "id": "traveller-name-generator",
   "title": "Traveller Name Generator",
   "description": "Generates Solomani, Vilani, and mixed-heritage NPC names, plus starship names, for Mongoose Traveller 2e campaigns. Opens as an in-app window with a copy-paste-ready list.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": {
     "minimum": "11",
     "verified": "13"
@@ -14,7 +14,7 @@
     "scripts/generator.js"
   ],
   "languages": [],
-  "url": "https://github.com/rtrm/traveller-NameGenerator",
-  "manifest": "https://raw.githubusercontent.com/rtrm/traveller-NameGenerator/main/module.json",
-  "download": "https://github.com/rtrm/traveller-NameGenerator/archive/refs/heads/main.zip"
+  "url": "https://github.com/rtrm/traveller-name-generator",
+  "manifest": "https://raw.githubusercontent.com/rtrm/traveller-name-generator/main/module.json",
+  "download": "https://github.com/rtrm/traveller-name-generator/archive/refs/heads/main.zip"
 }
