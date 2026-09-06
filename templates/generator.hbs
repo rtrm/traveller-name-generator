@@ -53,35 +53,76 @@
   #tng-root .tng-tab:hover { color: var(--text); }
   #tng-root .tng-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
 
-  #tng-root .tng-panel { display: none; margin-top: 14px; }
+  #tng-root .tng-panel { display: none; margin-top: 12px; }
   #tng-root .tng-panel.active { display: block; }
 
-  #tng-root .tng-field { margin-bottom: 14px; }
-  #tng-root .tng-field label {
-    display: block;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  #tng-root .tng-options-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
   }
-  #tng-root .tng-hint { text-transform: none; font-style: italic; }
+  #tng-root .tng-opt { display: flex; flex-direction: column; gap: 5px; }
+  #tng-root .tng-opt label {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    white-space: nowrap;
+  }
 
-  #tng-root .tng-toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  #tng-root .tng-toggle {
-    font-family: inherit;
+  #tng-root .tng-select { position: relative; }
+  #tng-root .tng-select-btn {
+    min-width: 118px;
+    text-align: left;
     background: var(--panel);
     border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 6px 12px;
-    border-radius: 14px;
+    color: var(--text);
+    padding: 7px 26px 7px 10px;
+    border-radius: 4px;
     font-size: 12px;
+    font-family: inherit;
     cursor: pointer;
+    position: relative;
+    white-space: nowrap;
   }
-  #tng-root .tng-toggle:hover { color: var(--text); border-color: var(--text-muted); }
-  #tng-root .tng-toggle.active { color: #14100a; background: var(--gold); border-color: var(--gold); font-weight: 600; }
+  #tng-root .tng-select-btn::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 45%;
+    width: 6px; height: 6px;
+    border-right: 2px solid var(--text-muted);
+    border-bottom: 2px solid var(--text-muted);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  #tng-root .tng-select-btn:hover { border-color: var(--text-muted); }
+  #tng-root .tng-select-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 50;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+  #tng-root .tng-select-menu.open { display: block; }
+  #tng-root .tng-select-opt {
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #tng-root .tng-select-opt:hover { background: var(--panel-alt); }
+  #tng-root .tng-select-opt.selected { color: var(--gold); }
 
   #tng-root .tng-qty-input {
-    width: 90px;
+    width: 64px;
     background: var(--panel-alt);
     border: 1px solid var(--border);
     color: var(--text);
@@ -96,7 +137,7 @@
     background: var(--gold);
     color: #14100a;
     border: none;
-    padding: 8px 16px;
+    padding: 7px 16px;
     border-radius: 4px;
     font-size: 12.5px;
     font-weight: 600;
@@ -106,8 +147,10 @@
   #tng-root .tng-btn-ghost { background: none; border: 1px solid var(--border); color: var(--text-muted); }
   #tng-root .tng-btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
 
+  #tng-root .tng-lore-note { color: var(--text-muted); font-size: 11px; font-style: italic; margin: 8px 0 0; }
+
   #tng-root .tng-results-header {
-    margin-top: 20px;
+    margin-top: 18px;
     padding-top: 12px;
     border-top: 1px solid var(--border);
     display: flex;
@@ -159,112 +202,189 @@
 <div id="tng-root">
   <div class="tng-header">
     <p class="tng-title">Traveller <span>Name Generator</span></p>
-    <p class="tng-subtitle">Solomani, Vilani, mixed-heritage, and starship names for Mongoose Traveller 2e</p>
+    <p class="tng-subtitle">Solomani, Vilani, Aslan, mixed-heritage, and starship names for Mongoose Traveller 2e</p>
   </div>
 
   <div class="tng-tabs">
     <button type="button" class="tng-tab active" data-tng-tab="solomani">Solomani</button>
     <button type="button" class="tng-tab" data-tng-tab="vilani">Vilani</button>
+    <button type="button" class="tng-tab" data-tng-tab="aslan">Aslan</button>
     <button type="button" class="tng-tab" data-tng-tab="mixed">Mixed</button>
     <button type="button" class="tng-tab" data-tng-tab="ships">Starships</button>
   </div>
 
   <div class="tng-panel active" data-tng-panel="solomani">
-    <div class="tng-field">
-      <label>Culture</label>
-      <div class="tng-toggle-group" data-tng-toggle-group="solomani:culture">
-        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="anglo">Anglo</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="latin">Latin</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="slavic">Slavic</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="chinese">Chinese</button>
+    <div class="tng-options-row">
+      <div class="tng-opt">
+        <label>Culture</label>
+        <div class="tng-select" data-tng-select-for="solomani:culture">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Any</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="any">Any</div>
+            <div class="tng-select-opt" data-tng-select-opt="anglo">Anglo</div>
+            <div class="tng-select-opt" data-tng-select-opt="latin">Latin</div>
+            <div class="tng-select-opt" data-tng-select-opt="slavic">Slavic</div>
+            <div class="tng-select-opt" data-tng-select-opt="chinese">Chinese</div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="tng-field">
-      <label>Gender</label>
-      <div class="tng-toggle-group" data-tng-toggle-group="solomani:gender">
-        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="male">Male</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="female">Female</button>
+      <div class="tng-opt">
+        <label>Gender</label>
+        <div class="tng-select" data-tng-select-for="solomani:gender">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Any</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="any">Any</div>
+            <div class="tng-select-opt" data-tng-select-opt="male">Male</div>
+            <div class="tng-select-opt" data-tng-select-opt="female">Female</div>
+          </div>
+        </div>
       </div>
+      <div class="tng-opt">
+        <label>Quantity</label>
+        <input type="number" class="tng-qty-input" data-tng-qty="solomani" value="10" min="1" max="100">
+      </div>
+      <button type="button" class="tng-btn" data-tng-generate="solomani">Generate</button>
     </div>
-    <div class="tng-field">
-      <label>Quantity</label>
-      <input type="number" class="tng-qty-input" data-tng-qty="solomani" value="10" min="1" max="100">
-    </div>
-    <button type="button" class="tng-btn" data-tng-generate="solomani">Generate</button>
   </div>
 
   <div class="tng-panel" data-tng-panel="vilani">
-    <div class="tng-field">
-      <label>Gender <span class="tng-hint">(affects which canonical examples appear)</span></label>
-      <div class="tng-toggle-group" data-tng-toggle-group="vilani:gender">
-        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="male">Male</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="female">Female</button>
+    <div class="tng-options-row">
+      <div class="tng-opt">
+        <label>Gender</label>
+        <div class="tng-select" data-tng-select-for="vilani:gender">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Any</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="any">Any</div>
+            <div class="tng-select-opt" data-tng-select-opt="male">Male</div>
+            <div class="tng-select-opt" data-tng-select-opt="female">Female</div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="tng-field">
-      <label>Include clan name</label>
-      <div class="tng-toggle-group" data-tng-toggle-group="vilani:includeClan">
-        <button type="button" class="tng-toggle active" data-tng-toggle="true">Yes</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="false">No</button>
+      <div class="tng-opt">
+        <label>Clan name</label>
+        <div class="tng-select" data-tng-select-for="vilani:includeClan">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Yes</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="true">Yes</div>
+            <div class="tng-select-opt" data-tng-select-opt="false">No</div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="tng-field">
-      <label>Include social name <span class="tng-hint">(rarely used except formally)</span></label>
-      <div class="tng-toggle-group" data-tng-toggle-group="vilani:includeSocial">
-        <button type="button" class="tng-toggle" data-tng-toggle="true">Yes</button>
-        <button type="button" class="tng-toggle active" data-tng-toggle="false">No</button>
+      <div class="tng-opt">
+        <label>Social name</label>
+        <div class="tng-select" data-tng-select-for="vilani:includeSocial">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>No</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt" data-tng-select-opt="true">Yes</div>
+            <div class="tng-select-opt selected" data-tng-select-opt="false">No</div>
+          </div>
+        </div>
       </div>
+      <div class="tng-opt">
+        <label>Quantity</label>
+        <input type="number" class="tng-qty-input" data-tng-qty="vilani" value="10" min="1" max="100">
+      </div>
+      <button type="button" class="tng-btn" data-tng-generate="vilani">Generate</button>
     </div>
-    <div class="tng-field">
-      <label>Quantity</label>
-      <input type="number" class="tng-qty-input" data-tng-qty="vilani" value="10" min="1" max="100">
+    <p class="tng-lore-note">Gender isn't documented as sound-marked in Vilani — it only steers which canonical examples appear. Social names are rarely used except formally.</p>
+  </div>
+
+  <div class="tng-panel" data-tng-panel="aslan">
+    <div class="tng-options-row">
+      <div class="tng-opt">
+        <label>Formality</label>
+        <div class="tng-select" data-tng-select-for="aslan:formality">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Informal</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="informal">Informal</div>
+            <div class="tng-select-opt" data-tng-select-opt="formal">Formal</div>
+          </div>
+        </div>
+      </div>
+      <div class="tng-opt">
+        <label>Clan name</label>
+        <div class="tng-select" data-tng-select-for="aslan:includeClan">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Yes</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="true">Yes</div>
+            <div class="tng-select-opt" data-tng-select-opt="false">No</div>
+          </div>
+        </div>
+      </div>
+      <div class="tng-opt">
+        <label>Quantity</label>
+        <input type="number" class="tng-qty-input" data-tng-qty="aslan" value="10" min="1" max="100">
+      </div>
+      <button type="button" class="tng-btn" data-tng-generate="aslan">Generate</button>
     </div>
-    <button type="button" class="tng-btn" data-tng-generate="vilani">Generate</button>
+    <p class="tng-lore-note">Aslan custom holds that <em>shorter</em> legal names denote <em>higher</em> status — Formal produces the long compound names of lesser Aslan, Informal the short names of the prestigious few. Gender isn't documented as sound-marked, so it isn't modeled.</p>
   </div>
 
   <div class="tng-panel" data-tng-panel="mixed">
-    <div class="tng-field">
-      <label>Style</label>
-      <div class="tng-toggle-group" data-tng-toggle-group="mixed:style">
-        <button type="button" class="tng-toggle active" data-tng-toggle="random">Random mix</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="sol-first">Solomani first, Vilani clan</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="vil-first">Vilani first, Solomani surname</button>
+    <div class="tng-options-row">
+      <div class="tng-opt">
+        <label>Style</label>
+        <div class="tng-select" data-tng-select-for="mixed:style">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Random mix</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="random">Random mix</div>
+            <div class="tng-select-opt" data-tng-select-opt="sol-first">Solomani first, Vilani clan</div>
+            <div class="tng-select-opt" data-tng-select-opt="vil-first">Vilani first, Solomani surname</div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="tng-field">
-      <label>Gender</label>
-      <div class="tng-toggle-group" data-tng-toggle-group="mixed:gender">
-        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="male">Male</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="female">Female</button>
+      <div class="tng-opt">
+        <label>Gender</label>
+        <div class="tng-select" data-tng-select-for="mixed:gender">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Any</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="any">Any</div>
+            <div class="tng-select-opt" data-tng-select-opt="male">Male</div>
+            <div class="tng-select-opt" data-tng-select-opt="female">Female</div>
+          </div>
+        </div>
       </div>
+      <div class="tng-opt">
+        <label>Quantity</label>
+        <input type="number" class="tng-qty-input" data-tng-qty="mixed" value="10" min="1" max="100">
+      </div>
+      <button type="button" class="tng-btn" data-tng-generate="mixed">Generate</button>
     </div>
-    <div class="tng-field">
-      <label>Quantity</label>
-      <input type="number" class="tng-qty-input" data-tng-qty="mixed" value="10" min="1" max="100">
-    </div>
-    <button type="button" class="tng-btn" data-tng-generate="mixed">Generate</button>
+    <p class="tng-lore-note">Solomani/Vilani heritage only — Aslan names are kept separate under their own tab.</p>
   </div>
 
   <div class="tng-panel" data-tng-panel="ships">
-    <div class="tng-field">
-      <label>Style</label>
-      <div class="tng-toggle-group" data-tng-toggle-group="ships:style">
-        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="virtue">Virtue</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="myth">Mythological</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="poetic">Poetic phrase</button>
-        <button type="button" class="tng-toggle" data-tng-toggle="merchant">Merchant</button>
+    <div class="tng-options-row">
+      <div class="tng-opt">
+        <label>Origin</label>
+        <div class="tng-select" data-tng-select-for="ships:origin">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Human</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="human">Human</div>
+            <div class="tng-select-opt" data-tng-select-opt="aslan">Aslan</div>
+          </div>
+        </div>
       </div>
+      <div class="tng-opt">
+        <label>Style</label>
+        <div class="tng-select" data-tng-select-for="ships:style">
+          <button type="button" class="tng-select-btn" data-tng-select-toggle>Any</button>
+          <div class="tng-select-menu">
+            <div class="tng-select-opt selected" data-tng-select-opt="any">Any</div>
+            <div class="tng-select-opt" data-tng-select-opt="virtue">Virtue</div>
+            <div class="tng-select-opt" data-tng-select-opt="myth">Mythological</div>
+            <div class="tng-select-opt" data-tng-select-opt="poetic">Poetic phrase</div>
+            <div class="tng-select-opt" data-tng-select-opt="merchant">Merchant</div>
+          </div>
+        </div>
+      </div>
+      <div class="tng-opt">
+        <label>Quantity</label>
+        <input type="number" class="tng-qty-input" data-tng-qty="ships" value="10" min="1" max="100">
+      </div>
+      <button type="button" class="tng-btn" data-tng-generate="ships">Generate</button>
     </div>
-    <div class="tng-field">
-      <label>Quantity</label>
-      <input type="number" class="tng-qty-input" data-tng-qty="ships" value="10" min="1" max="100">
-    </div>
-    <button type="button" class="tng-btn" data-tng-generate="ships">Generate</button>
+    <p class="tng-lore-note">Aslan ship names follow Trokh's documented grammar: "Ua'" + a root forms an adjectival name, "-leao" nominalizes one, and Ya'/Hka'/Ao' are class prefixes for capital ships/cruisers/support vessels.</p>
   </div>
 
   <div class="tng-results-header">

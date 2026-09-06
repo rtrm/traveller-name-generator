@@ -127,9 +127,72 @@ function generateMixedName(style, gender) {
 }
 
 // ---------------------------------------------------------------------------
-// Starship names — drawing on classic Traveller conventions: single virtue
-// or mythological words, evocative poetic phrases, and merchant-flavored
-// aspirational names (per Free Trader tradition).
+// Aslan names — built from real canonical clan names (Traveller Wiki's Aslan
+// Clan list) and the one confirmed canonical personal name from the Pirates
+// of Drinax text itself, "Kasiyl of the Ahroay'if" — which also gives the
+// real "[personal name] of the [clan name]" naming pattern used here.
+// Aslan lore holds that *shorter* legal names denote *higher* status, so
+// "Formality" controls syllable count: Informal (short, higher-status-
+// sounding) vs Formal (long). Gender isn't documented as sound-marked in the
+// available sources, so it isn't modeled here (matching the Vilani caveat).
+// ---------------------------------------------------------------------------
+const ASLAN_CANON_PERSONAL = ["Kasiyl"];
+const ASLAN_CANON_CLAN = [
+  "Aiheilar", "Akatoiloh", "Aokhalte", "Eakhtiyho", "Eisohiyw", "Estoieie'", "Eteawyolei'", "Faowaou",
+  "Ferekhearl", "Fteweyeakh", "Hlyueawi", "Hrawoao", "Ikhtealyo", "Isoitiyro", "Iykyasea", "Khaukheairl",
+  "Ouokhoi", "Riyhalaei", "Sahao'", "Seieakh", "Syoisuis", "Tlerlearlyo", "Toaseilwi", "Tralyeaeawi",
+  "Uiktawa", "We'okurir", "Yerlyaruiwo", "Yetahikh", "Yulraleh", "Ahroay'if", "Arao'e", "Arhiyao",
+  "Ausikhahear", "Awiykhalr", "Ereyo", "Hkahaoseahe", "Hlaotiyoiho", "Htyowao", "Loakhtarl", "Raohkeil",
+  "Taukhaotuar", "Tilrui", "Tokolfearh",
+];
+
+const ASLAN_ONSETS = ["", "", "f", "h", "k", "kh", "l", "r", "s", "t", "tl", "tr", "w", "y", "hl", "hr", "rl"];
+const ASLAN_VOWELS = ["a", "e", "i", "o", "u", "ei", "oi", "ao", "ea", "io", "ui", "eo", "ia", "ou", "ie", "oa", "au"];
+const ASLAN_CODAS = ["", "", "kh", "l", "r", "s", "t", "w", "y", "hk", "rl"];
+
+function aslanSyllable() {
+  return pick(ASLAN_ONSETS) + pick(ASLAN_VOWELS) + pick(ASLAN_CODAS);
+}
+
+function buildAslanWord(syllableCount) {
+  const parts = [];
+  for (let i = 0; i < syllableCount; i++) parts.push(aslanSyllable());
+  let word = parts.join("");
+  // Apostrophes appear in roughly a fifth of real clan names, usually at a
+  // syllable boundary (e.g. Sahao', We'okurir, Ahroay'if).
+  if (syllableCount > 1 && Math.random() < 0.25) {
+    const boundary = 1 + Math.floor(Math.random() * (syllableCount - 1));
+    const idx = parts.slice(0, boundary).join("").length;
+    if (idx > 0 && idx < word.length) word = word.slice(0, idx) + "'" + word.slice(idx);
+  }
+  return cap(word);
+}
+
+function aslanPersonalName(formality) {
+  if (Math.random() < 0.15) return pick(ASLAN_CANON_PERSONAL);
+  const syllables = formality === "formal" ? 4 + (Math.random() < 0.5 ? 1 : 0) : 2;
+  return buildAslanWord(syllables);
+}
+
+function aslanClanName() {
+  if (Math.random() < 0.4) return pick(ASLAN_CANON_CLAN);
+  return buildAslanWord(3 + (Math.random() < 0.5 ? 1 : 0));
+}
+
+function generateAslanName(formality, includeClan) {
+  const personal = aslanPersonalName(formality);
+  return includeClan ? `${personal} of the ${aslanClanName()}` : personal;
+}
+
+// ---------------------------------------------------------------------------
+// Starship names — Human (Solomani/Vilani) ships draw on classic Traveller
+// conventions: single virtue or mythological words, evocative poetic
+// phrases, and merchant-flavored aspirational names (Free Trader tradition).
+// Aslan ships instead follow Trokh's own documented ship-naming grammar
+// (Traveller Wiki): "Ua'" + a verbal root forms an adjectival name (e.g. the
+// canonical Ua'haloia, "Bright"), a "-leao" suffix nominalizes a root (e.g.
+// Haloialeao, "Brightness"), and Ya'/Hka'/Ao' are colloquial class prefixes
+// for capital ships/cruisers/support vessels respectively.
 // ---------------------------------------------------------------------------
 const SHIP_VIRTUES = ["Valiant", "Intrepid", "Resolute", "Indomitable", "Steadfast", "Endeavour", "Vigilant", "Dauntless", "Tenacious", "Relentless", "Constancy", "Perseverance", "Fortitude", "Audacity", "Defiance", "Vanguard", "Sentinel", "Paragon", "Ascendant", "Zenith"];
 const SHIP_MYTH = ["Beowulf", "Perseus", "Icarus", "Prometheus", "Odysseus", "Ozymandias", "Excalibur", "Valkyrie", "Nemesis", "Atlas", "Orpheus", "Cassandra", "Leviathan", "Charon", "Nike", "Hyperion", "Ariadne", "Achilles", "Pandora", "Chimera"];
@@ -137,6 +200,7 @@ const SHIP_NOUNS = ["Comet", "Nebula", "Horizon", "Aurora", "Meridian", "Eclipse
 const SHIP_ABSTRACT = ["Whisper", "Echo", "Shadow", "Memory", "Promise", "Legacy", "Fortune", "Destiny", "Requiem", "Anthem", "Journey", "Passage", "Reckoning", "Solace", "Reverie", "Vigil", "Omen", "Verdict", "Covenant", "Threshold"];
 const SHIP_ADJECTIVES = ["Silent", "Distant", "Restless", "Wandering", "Fading", "Rising", "Last", "Lone", "Forgotten", "Endless", "Silver", "Golden", "Crimson", "Northern", "Far", "Quiet", "Bold", "Free", "Wild", "Bright"];
 const SHIP_MERCHANT = ["Fair Wind", "Long Reach", "Silver Fortune", "Golden Venture", "Steady Trade", "Open Road", "Second Chance", "Lucky Star", "Honest Profit", "Far Horizon", "Trade Wind", "Safe Passage", "Merchant's Hope", "Free Passage", "Northern Star"];
+const ASLAN_SHIP_CANON = ["Aoa'iw", "Sakhai", "Hraye", "Khtukhao", "Aositaoh"];
 
 function generateShipName(style) {
   const s = style && style !== "any" ? style : pick(["virtue", "myth", "poetic", "merchant"]);
@@ -149,6 +213,15 @@ function generateShipName(style) {
   return `${pick(SHIP_ABSTRACT)} of the ${pick(SHIP_NOUNS)}`;
 }
 
+function generateAslanShipName(style) {
+  const s = style && style !== "any" ? style : pick(["canon", "adjectival", "nominal", "category"]);
+  if (s === "canon") return pick(ASLAN_SHIP_CANON);
+  const root = buildAslanWord(2).toLowerCase();
+  if (s === "adjectival") return `Ua'${root}`;
+  if (s === "nominal") return cap(`${root}leao`);
+  return `${pick(["Ya'", "Hka'", "Ao'"])}${root}`;
+}
+
 // ---------------------------------------------------------------------------
 // Application
 // ---------------------------------------------------------------------------
@@ -159,7 +232,7 @@ class TravellerNameGeneratorApp extends Application {
       title: "Traveller Name Generator",
       template: `modules/${MODULE_ID}/templates/generator.hbs`,
       width: 480,
-      height: 640,
+      height: 620,
       resizable: true,
       classes: ["tng-window"]
     });
@@ -172,7 +245,8 @@ class TravellerNameGeneratorApp extends Application {
       solomani: { culture: "any", gender: "any", quantity: 10 },
       vilani: { gender: "any", includeClan: true, includeSocial: false, quantity: 10 },
       mixed: { style: "random", gender: "any", quantity: 10 },
-      ships: { style: "any", quantity: 10 },
+      aslan: { formality: "informal", includeClan: true, quantity: 10 },
+      ships: { origin: "human", style: "any", quantity: 10 },
     };
     this.results = [];
   }
@@ -194,17 +268,6 @@ class TravellerNameGeneratorApp extends Application {
       });
     });
 
-    root.querySelectorAll("[data-tng-toggle-group]").forEach(group => {
-      group.querySelectorAll("[data-tng-toggle]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const tab = group.dataset.tngToggleGroup.split(":")[0];
-          const key = group.dataset.tngToggleGroup.split(":")[1];
-          this.options_[tab][key] = btn.dataset.tngToggle === "true" ? true : btn.dataset.tngToggle === "false" ? false : btn.dataset.tngToggle;
-          group.querySelectorAll("[data-tng-toggle]").forEach(b => b.classList.toggle("active", b === btn));
-        });
-      });
-    });
-
     root.querySelectorAll("[data-tng-generate]").forEach(btn => {
       btn.addEventListener("click", () => this._generate(btn.dataset.tngGenerate));
     });
@@ -220,13 +283,76 @@ class TravellerNameGeneratorApp extends Application {
 
     root.querySelector("[data-tng-copy-all]").addEventListener("click", () => this._copyAll());
 
+    if (this._outsideClickHandler) document.removeEventListener("click", this._outsideClickHandler);
+    this._outsideClickHandler = (e) => {
+      if (!e.target.closest(".tng-select")) {
+        root.querySelectorAll(".tng-select-menu.open").forEach(m => m.classList.remove("open"));
+      }
+    };
+    document.addEventListener("click", this._outsideClickHandler);
+
     root.addEventListener("click", (e) => {
       const copyBtn = e.target.closest("[data-tng-copy-line]");
       if (copyBtn) {
         const text = copyBtn.closest("[data-tng-result]").querySelector(".tng-result-text").textContent;
         this._copyText(text, copyBtn);
+        return;
       }
+
+      const selectToggle = e.target.closest("[data-tng-select-toggle]");
+      if (selectToggle) {
+        const menu = selectToggle.nextElementSibling;
+        const wasOpen = menu.classList.contains("open");
+        root.querySelectorAll(".tng-select-menu.open").forEach(m => m.classList.remove("open"));
+        if (!wasOpen) menu.classList.add("open");
+        return;
+      }
+
+      const selectOpt = e.target.closest("[data-tng-select-opt]");
+      if (selectOpt) {
+        const wrapper = selectOpt.closest(".tng-select");
+        const [tab, key] = wrapper.dataset.tngSelectFor.split(":");
+        const raw = selectOpt.dataset.tngSelectOpt;
+        this.options_[tab][key] = raw === "true" ? true : raw === "false" ? false : raw;
+        wrapper.querySelector("[data-tng-select-toggle]").textContent = selectOpt.textContent;
+        wrapper.querySelectorAll("[data-tng-select-opt]").forEach(o => o.classList.toggle("selected", o === selectOpt));
+        wrapper.querySelector(".tng-select-menu").classList.remove("open");
+
+        if (tab === "ships" && key === "origin") {
+          this.options_.ships.style = "any";
+          const styleWrapper = this.root.querySelector('[data-tng-select-for="ships:style"]');
+          if (styleWrapper) styleWrapper.innerHTML = this._selectInnerHtml(this._shipStyleItems(raw), "any");
+        }
+        return;
+      }
+
+      root.querySelectorAll(".tng-select-menu.open").forEach(m => m.classList.remove("open"));
     });
+  }
+
+  _shipStyleItems(origin) {
+    if (origin === "aslan") {
+      return [
+        { value: "any", label: "Any" },
+        { value: "canon", label: "Canonical" },
+        { value: "adjectival", label: "Adjectival (Ua'-)" },
+        { value: "nominal", label: "Nominalized (-leao)" },
+        { value: "category", label: "Class-prefixed" },
+      ];
+    }
+    return [
+      { value: "any", label: "Any" },
+      { value: "virtue", label: "Virtue" },
+      { value: "myth", label: "Mythological" },
+      { value: "poetic", label: "Poetic phrase" },
+      { value: "merchant", label: "Merchant" },
+    ];
+  }
+
+  _selectInnerHtml(items, selected) {
+    const selectedItem = items.find(it => it.value === selected) || items[0];
+    const opts = items.map(it => `<div class="tng-select-opt ${it.value === selected ? "selected" : ""}" data-tng-select-opt="${esc(it.value)}">${esc(it.label)}</div>`).join("");
+    return `<button type="button" class="tng-select-btn" data-tng-select-toggle>${esc(selectedItem.label)}</button><div class="tng-select-menu">${opts}</div>`;
   }
 
   async _copyText(text, btn) {
@@ -262,8 +388,10 @@ class TravellerNameGeneratorApp extends Application {
         results.push(generateVilaniName(opts.gender === "any" ? null : opts.gender, opts.includeClan, opts.includeSocial));
       } else if (tab === "mixed") {
         results.push(generateMixedName(opts.style, opts.gender === "any" ? null : opts.gender));
+      } else if (tab === "aslan") {
+        results.push(generateAslanName(opts.formality, opts.includeClan));
       } else if (tab === "ships") {
-        results.push(generateShipName(opts.style));
+        results.push(opts.origin === "aslan" ? generateAslanShipName(opts.style) : generateShipName(opts.style));
       }
     }
     this.results = results;
