@@ -1,0 +1,269 @@
+<div class="tng-wrapper">
+<style>
+  #tng-root {
+    color-scheme: dark;
+    --bg: #0b0f17;
+    --panel: #141b28;
+    --panel-alt: #1b2432;
+    --border: #2b3548;
+    --text: #dfe4ec;
+    --text-muted: #8892a3;
+    --gold: #c9a24a;
+    --teal: #4fb0a6;
+
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    height: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  #tng-root * { box-sizing: border-box; }
+
+  #tng-root .tng-header { border-bottom: 1px solid var(--border); padding-bottom: 14px; }
+  #tng-root .tng-title {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  #tng-root .tng-title span { color: var(--gold); }
+  #tng-root .tng-subtitle { color: var(--text-muted); font-size: 12px; margin: 0; }
+
+  #tng-root .tng-tabs {
+    margin-top: 14px;
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  #tng-root .tng-tab {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    padding: 8px 4px;
+    margin-right: 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  #tng-root .tng-tab:hover { color: var(--text); }
+  #tng-root .tng-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  #tng-root .tng-panel { display: none; margin-top: 14px; }
+  #tng-root .tng-panel.active { display: block; }
+
+  #tng-root .tng-field { margin-bottom: 14px; }
+  #tng-root .tng-field label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  #tng-root .tng-hint { text-transform: none; font-style: italic; }
+
+  #tng-root .tng-toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  #tng-root .tng-toggle {
+    font-family: inherit;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 14px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  #tng-root .tng-toggle:hover { color: var(--text); border-color: var(--text-muted); }
+  #tng-root .tng-toggle.active { color: #14100a; background: var(--gold); border-color: var(--gold); font-weight: 600; }
+
+  #tng-root .tng-qty-input {
+    width: 90px;
+    background: var(--panel-alt);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 9px;
+    border-radius: 4px;
+    font-size: 12.5px;
+  }
+  #tng-root .tng-qty-input:focus { outline: none; border-color: var(--gold); }
+
+  #tng-root .tng-btn {
+    font-family: inherit;
+    background: var(--gold);
+    color: #14100a;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #tng-root .tng-btn:hover { filter: brightness(1.08); }
+  #tng-root .tng-btn-ghost { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+  #tng-root .tng-btn-ghost:hover { color: var(--text); border-color: var(--text-muted); }
+
+  #tng-root .tng-results-header {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  #tng-root .tng-results { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  #tng-root .tng-empty { color: var(--text-muted); font-size: 12.5px; margin: 20px 0; text-align: center; }
+  #tng-root .tng-result {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  #tng-root .tng-result-text { user-select: text; }
+  #tng-root .tng-copy-btn {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: 10px;
+  }
+  #tng-root .tng-copy-btn:hover { color: var(--gold); border-color: var(--gold); }
+</style>
+
+<div id="tng-root">
+  <div class="tng-header">
+    <p class="tng-title">Traveller <span>Name Generator</span></p>
+    <p class="tng-subtitle">Solomani, Vilani, mixed-heritage, and starship names for Mongoose Traveller 2e</p>
+  </div>
+
+  <div class="tng-tabs">
+    <button type="button" class="tng-tab active" data-tng-tab="solomani">Solomani</button>
+    <button type="button" class="tng-tab" data-tng-tab="vilani">Vilani</button>
+    <button type="button" class="tng-tab" data-tng-tab="mixed">Mixed</button>
+    <button type="button" class="tng-tab" data-tng-tab="ships">Starships</button>
+  </div>
+
+  <div class="tng-panel active" data-tng-panel="solomani">
+    <div class="tng-field">
+      <label>Culture</label>
+      <div class="tng-toggle-group" data-tng-toggle-group="solomani:culture">
+        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="anglo">Anglo</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="latin">Latin</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="slavic">Slavic</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="chinese">Chinese</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Gender</label>
+      <div class="tng-toggle-group" data-tng-toggle-group="solomani:gender">
+        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="male">Male</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="female">Female</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Quantity</label>
+      <input type="number" class="tng-qty-input" data-tng-qty="solomani" value="10" min="1" max="100">
+    </div>
+    <button type="button" class="tng-btn" data-tng-generate="solomani">Generate</button>
+  </div>
+
+  <div class="tng-panel" data-tng-panel="vilani">
+    <div class="tng-field">
+      <label>Gender <span class="tng-hint">(affects which canonical examples appear)</span></label>
+      <div class="tng-toggle-group" data-tng-toggle-group="vilani:gender">
+        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="male">Male</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="female">Female</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Include clan name</label>
+      <div class="tng-toggle-group" data-tng-toggle-group="vilani:includeClan">
+        <button type="button" class="tng-toggle active" data-tng-toggle="true">Yes</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="false">No</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Include social name <span class="tng-hint">(rarely used except formally)</span></label>
+      <div class="tng-toggle-group" data-tng-toggle-group="vilani:includeSocial">
+        <button type="button" class="tng-toggle" data-tng-toggle="true">Yes</button>
+        <button type="button" class="tng-toggle active" data-tng-toggle="false">No</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Quantity</label>
+      <input type="number" class="tng-qty-input" data-tng-qty="vilani" value="10" min="1" max="100">
+    </div>
+    <button type="button" class="tng-btn" data-tng-generate="vilani">Generate</button>
+  </div>
+
+  <div class="tng-panel" data-tng-panel="mixed">
+    <div class="tng-field">
+      <label>Style</label>
+      <div class="tng-toggle-group" data-tng-toggle-group="mixed:style">
+        <button type="button" class="tng-toggle active" data-tng-toggle="random">Random mix</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="sol-first">Solomani first, Vilani clan</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="vil-first">Vilani first, Solomani surname</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Gender</label>
+      <div class="tng-toggle-group" data-tng-toggle-group="mixed:gender">
+        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="male">Male</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="female">Female</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Quantity</label>
+      <input type="number" class="tng-qty-input" data-tng-qty="mixed" value="10" min="1" max="100">
+    </div>
+    <button type="button" class="tng-btn" data-tng-generate="mixed">Generate</button>
+  </div>
+
+  <div class="tng-panel" data-tng-panel="ships">
+    <div class="tng-field">
+      <label>Style</label>
+      <div class="tng-toggle-group" data-tng-toggle-group="ships:style">
+        <button type="button" class="tng-toggle active" data-tng-toggle="any">Any</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="virtue">Virtue</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="myth">Mythological</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="poetic">Poetic phrase</button>
+        <button type="button" class="tng-toggle" data-tng-toggle="merchant">Merchant</button>
+      </div>
+    </div>
+    <div class="tng-field">
+      <label>Quantity</label>
+      <input type="number" class="tng-qty-input" data-tng-qty="ships" value="10" min="1" max="100">
+    </div>
+    <button type="button" class="tng-btn" data-tng-generate="ships">Generate</button>
+  </div>
+
+  <div class="tng-results-header">
+    <span>Results</span>
+    <button type="button" class="tng-btn tng-btn-ghost" data-tng-copy-all>Copy All</button>
+  </div>
+  <div class="tng-results" data-tng-results>
+    <p class="tng-empty">Click Generate to produce a list of names.</p>
+  </div>
+</div>
+</div>
