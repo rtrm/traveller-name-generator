@@ -131,18 +131,27 @@
     padding: 8px 10px;
     font-size: 13px;
   }
-  #tng-root .tng-result-text { user-select: text; }
+  #tng-root .tng-result-text {
+    user-select: text;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   #tng-root .tng-copy-btn {
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
     background: none;
     border: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 10.5px;
-    padding: 3px 8px;
+    padding: 3px 0;
     border-radius: 3px;
     cursor: pointer;
     flex-shrink: 0;
     margin-left: 10px;
+    width: 56px;
+    text-align: center;
   }
   #tng-root .tng-copy-btn:hover { color: var(--gold); border-color: var(--gold); }
 </style>

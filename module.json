@@ -2,7 +2,7 @@
   "id": "traveller-name-generator",
   "title": "Traveller Name Generator",
   "description": "Generates Solomani, Vilani, and mixed-heritage NPC names, plus starship names, for Mongoose Traveller 2e campaigns. Opens as an in-app window with a copy-paste-ready list.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": {
     "minimum": "11",
     "verified": "13"
