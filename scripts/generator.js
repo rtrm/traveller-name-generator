@@ -418,7 +418,16 @@ Hooks.once("ready", () => {
     if (!mod.app) mod.app = new TravellerNameGeneratorApp();
     mod.app.render(true);
   };
-  if (mod) mod.api = { open: openGenerator };
+  if (mod) {
+    mod.api = {
+      open: openGenerator,
+      // Callable by other modules (e.g. Traveller Trading, for passenger
+      // names) without opening the generator window. Returns one
+      // Solomani/Vilani mixed-heritage name, matching the flavor most
+      // appropriate for a generic NPC.
+      generateName: () => generateMixedName("random", null)
+    };
+  }
 });
 
 // Best-effort button in the Actors Directory header, alongside the reliable
