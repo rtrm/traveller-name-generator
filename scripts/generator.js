@@ -223,20 +223,25 @@ function generateAslanShipName(style) {
 }
 
 // ---------------------------------------------------------------------------
-// Application
+// Application — built on ApplicationV2, not the deprecated v1 Application
+// class (Foundry has deprecated Application/FormApplication/Dialog v1 as of
+// v13 ahead of their eventual removal, so this targets the replacement API
+// throughout). This app's own .hbs template has no Handlebars bindings
+// (getData() previously returned {}) — it's rendered once as a static shell
+// and everything inside is built via direct innerHTML from JS, exactly as
+// before — so this uses a raw ApplicationV2 subclass (no
+// HandlebarsApplicationMixin) with a custom _renderHTML that still renders
+// that same .hbs file via the new foundry.applications.handlebars.
+// renderTemplate, rather than porting its ~400 lines of markup into a JS
+// template string.
 // ---------------------------------------------------------------------------
-class TravellerNameGeneratorApp extends Application {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      id: "traveller-name-generator-app",
-      title: "Traveller Name Generator",
-      template: `modules/${MODULE_ID}/templates/generator.hbs`,
-      width: 480,
-      height: 620,
-      resizable: true,
-      classes: ["tng-window"]
-    });
-  }
+class TravellerNameGeneratorApp extends foundry.applications.api.ApplicationV2 {
+  static DEFAULT_OPTIONS = {
+    id: "traveller-name-generator-app",
+    classes: ["tng-window"],
+    window: { title: "Traveller Name Generator", resizable: true },
+    position: { width: 480, height: 620 }
+  };
 
   constructor(options = {}) {
     super(options);
@@ -251,12 +256,18 @@ class TravellerNameGeneratorApp extends Application {
     this.results = [];
   }
 
-  getData() { return {}; }
+  async _renderHTML(context, options) {
+    return foundry.applications.handlebars.renderTemplate(`modules/${MODULE_ID}/templates/generator.hbs`, {});
+  }
 
-  activateListeners(html) {
-    super.activateListeners(html);
-    const root = html[0].querySelector("#tng-root");
+  async _replaceHTML(result, content, options) {
+    content.innerHTML = result;
+  }
+
+  async _onRender(context, options) {
+    const root = this.element.querySelector("#tng-root");
     this.root = root;
+    root.classList.toggle("tng-standard-look", standardLookEnabled());
 
     root.querySelectorAll("[data-tng-tab]").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -411,6 +422,31 @@ class TravellerNameGeneratorApp extends Application {
       </div>`).join("");
   }
 }
+
+// "Use Standard Foundry Styling" — off by default, so nothing changes for
+// existing worlds until a GM opts in. When on, the window's custom dark/
+// gold theme is replaced with the browser/OS's own system colors and the
+// default UI font (see the "tng-standard-look" CSS block in generator.hbs),
+// approximating Foundry's own native look rather than reproducing it
+// pixel-for-pixel.
+function standardLookEnabled() {
+  try { return !!game.settings.get(MODULE_ID, "standardLook"); } catch (err) { return false; }
+}
+
+Hooks.once("init", () => {
+  game.settings.register(MODULE_ID, "standardLook", {
+    name: "Use Standard Foundry Styling",
+    hint: "Replace this module's custom dark/gold theme with Foundry's own default window/button styling.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: () => {
+      const app = game.modules.get(MODULE_ID)?.app;
+      if (app?.rendered) app.root?.classList.toggle("tng-standard-look", standardLookEnabled());
+    }
+  });
+});
 
 Hooks.once("ready", () => {
   const mod = game.modules.get(MODULE_ID);
